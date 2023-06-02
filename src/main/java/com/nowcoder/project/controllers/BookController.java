@@ -1,15 +1,19 @@
 package com.nowcoder.project.controllers;
 
 import com.alibaba.excel.EasyExcelFactory;
+import com.nowcoder.project.common.constant.CommonConstant;
 import com.nowcoder.project.listener.ExcelWithoutHeadListener;
 import com.nowcoder.project.model.Book;
 import com.nowcoder.project.model.User;
 import com.nowcoder.project.service.BookService;
 import com.nowcoder.project.service.HostHolder;
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Constants;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,7 +26,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by nowcoder on 2018/08/04 下午3:41
@@ -82,12 +88,35 @@ public class BookController {
   }
 
   @RequestMapping(path = {"/books/import/do"}, method = {RequestMethod.POST})
-  public void doImportBook(MultipartFile file) throws IOException{
+  public String doImportBook(MultipartFile file,Model model) throws IOException{
     // 读取并解析Excel数据
     ExcelWithoutHeadListener<Book> excelListener = new ExcelWithoutHeadListener<>();
     EasyExcelFactory.read(file.getInputStream(), Book.class, excelListener).sheet().doRead();
-    List<Book> data = excelListener.getDataList();// 从excel里读取并解析好的数据
-    System.out.println(123);
+    List<Book> books = excelListener.getDataList();// 从excel里读取并解析好的数据
+    List<Book> successBooks = new ArrayList<>();
+    List<Book> failureBooks = new ArrayList<>();
+    if (!ObjectUtils.isEmpty(books)){
+      for (Book book : books) {
+        List<String> allBooks = bookService.getAllBooks().stream().map(u -> u.getName()).collect(Collectors.toList());
+        // 校验状态
+        if (book.getStatus() != 1 && book.getStatus() != 0){
+          book.setFailReason("状态值有误");
+          failureBooks.add(book);
+          continue;
+        }
+        // 校验是否重复
+        if (allBooks.contains(book.getName())){
+          book.setFailReason("书名重复");
+          failureBooks.add(book);
+          continue;
+        }
+        successBooks.add(book);
+        bookService.addBooks(book);
+      }
+    }
+    model.addAttribute("successBooks", successBooks);
+    model.addAttribute("failureBooks", failureBooks);
+    return "book/importBooks";
   }
 
   public static byte[] streamToByteArray(InputStream in) throws Exception {
