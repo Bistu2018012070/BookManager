@@ -1,5 +1,7 @@
 package com.nowcoder.project.controllers;
 
+import com.alibaba.excel.EasyExcelFactory;
+import com.nowcoder.project.listener.ExcelWithoutHeadListener;
 import com.nowcoder.project.model.Book;
 import com.nowcoder.project.model.User;
 import com.nowcoder.project.service.BookService;
@@ -20,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.util.List;
 
 /**
  * Created by nowcoder on 2018/08/04 下午3:41
@@ -79,7 +82,11 @@ public class BookController {
   }
 
   @RequestMapping(path = {"/books/import/do"}, method = {RequestMethod.POST})
-  public void doImportBook(MultipartFile file) {
+  public void doImportBook(MultipartFile file) throws IOException{
+    // 读取并解析Excel数据
+    ExcelWithoutHeadListener<Book> excelListener = new ExcelWithoutHeadListener<>();
+    EasyExcelFactory.read(file.getInputStream(), Book.class, excelListener).sheet().doRead();
+    List<Book> data = excelListener.getDataList();// 从excel里读取并解析好的数据
     System.out.println(123);
   }
 
