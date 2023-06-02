@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>导入图书</title>
+</head>
+<body>
+<h1>增加一个图书</h1>
+<form method="post" enctype="multipart/form-data" action="/books/import/do">
+	<div>
+		<label for="file">选择文件</label>
+		<input type="file" id="file" name="file" multiple />
+	</div>
+	<div>
+		<button>Submit</button>
+	</div>
+</form>
+
+</body>
+</html>
