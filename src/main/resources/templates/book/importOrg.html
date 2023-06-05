@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>导入组织</title>
+</head>
+<body>
+<h1>导入组织</h1>
+<form method="post" enctype="multipart/form-data" action="/books/importOrg/do">
+	<div>
+		<label for="file">选择文件</label>
+		<input type="file" id="file" name="file" multiple />
+	</div>
+	<div>
+		<button>Submit</button>
+	</div>
+</form>
+<#if successBooks??>
+<h2>成功列表</h2>
+<table border="1" cellpadding="10">
+	<tr>
+		<td>ID</td>
+		<td>书名</td>
+		<td>作者</td>
+		<td>价格</td>
+		<td>状态</td>
+	</tr>
+	<#list successBooks as book>
+	<tr>
+		<td><a>${book.id}</a></td>
+		<td>《${book.name}》</td>
+		<td>${book.author}</td>
+		<td>${book.price}</td>
+		<td><#if book.status == 0> 在库 <#elseif book.status == 1> 已借出 </#if></td>
+	</tr>
+</#list>
+</table>
+<#else>
+<h5>未导入
+</h5>
+</#if>
+
+<#if failureBooks??>
+<h2>失败列表</h2>
+<table border="1" cellpadding="10">
+	<tr>
+		<td>书名</td>
+		<td>作者</td>
+		<td>价格</td>
+		<td>状态值</td>
+		<td>失败原因</td>
+	</tr>
+	<#list failureBooks as book>
+	<tr>
+		<td>《${book.name}》</td>
+		<td>${book.author}</td>
+		<td>${book.price}</td>
+		<td>${book.status}</td>
+		<td>${book.failReason}</td>
+	</tr>
+</#list>
+</table>
+<#else>
+<h5>未导入
+</h5>
+</#if>
+
+</body>
+</html>

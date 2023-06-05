@@ -1,22 +1,28 @@
 package com.nowcoder.project.model;
 
+import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.annotation.write.style.ColumnWidth;
+import com.alibaba.excel.annotation.write.style.HeadRowHeight;
 
 /**图书实体类
  * @author zhangzq
  * @date 2023/5/6 9:35
  */
+@HeadRowHeight(20)
 public class Book {
 
   /**
    * 图书ID
    */
+  @ExcelIgnore
   private int id;
 
   /**
    * 书名
    */
   @ExcelProperty("书名")
+  @ColumnWidth(30)
   private String name;
 
   /**
@@ -36,11 +42,13 @@ public class Book {
    * {@link com.nowcoder.project.model.enums.BookStatusEnum}
    */
   @ExcelProperty("是否借出（1是 0否）")
+  @ColumnWidth(30)
   private int status;
 
   /**
    * 导入失败原因
    */
+  @ExcelIgnore
   private String failReason;
 
   public String getFailReason() {
